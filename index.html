@@ -301,4 +301,86 @@
                     if (completed && challenge.completionImage) {
                         card.className = 'challenge-card rounded-lg shadow-lg completed-card-image';
                         card.style.backgroundImage = `url('${challenge.completionImage}')`;
-                    } els
+                    } else {
+                        // Standard card rendering
+                        card.className = `challenge-card p-4 border-l-4 rounded-lg shadow-lg ${
+                            !isUnlocked ? 'locked-card' : 'cursor-pointer'
+                        } ${completed ? 'completed-card border-emerald-400' : 'border-transparent'}`;
+                        
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-lg ${isUnlocked ? 'text-white' : 'text-gray-400'}">Day ${day}</span>
+                                ${completed ? '<span class="text-emerald-400 font-bold text-xs">✔ DONE</span>' : ''}
+                                ${!isUnlocked ? '<span class="text-gray-500 text-2xl">🔒</span>' : ''}
+                            </div>
+                            <h3 class="font-semibold ${isUnlocked ? 'text-gray-200' : 'text-gray-500'}">${challenge.title}</h3>
+                        `;
+                    }
+
+                    // Add click listener if the card is unlocked, regardless of its appearance
+                    if (isUnlocked) {
+                        card.classList.add('cursor-pointer');
+                        card.addEventListener('click', () => openModal(day));
+                    }
+                    
+                    grid.appendChild(card);
+                });
+            }
+
+            // --- Modal Logic ---
+            function openModal(day) {
+                currentOpenDay = day;
+                const challenge = challenges[day - 1];
+                modalTitle.textContent = `Day ${day}: ${challenge.title}`;
+                modalDescription.textContent = challenge.description;
+                modalContent.innerHTML = challenge.content;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+
+                updateCompleteButtonState();
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                currentOpenDay = -1;
+            }
+            
+            function updateCompleteButtonState() {
+                if (isCompleted(currentOpenDay)) {
+                    completeChallengeBtn.textContent = 'Completed!';
+                    completeChallengeBtn.disabled = true;
+                    completeChallengeBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
+                    completeChallengeBtn.classList.add('bg-gray-500', 'cursor-not-allowed');
+                } else {
+                    completeChallengeBtn.textContent = 'Mark as Complete';
+                    completeChallengeBtn.disabled = false;
+                    completeChallengeBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
+                    completeChallengeBtn.classList.remove('bg-gray-500', 'cursor-not-allowed');
+                }
+            }
+
+            // --- Event Listeners ---
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            completeChallengeBtn.addEventListener('click', () => {
+                if (currentOpenDay > 0 && !isCompleted(currentOpenDay)) {
+                    completions.push(currentOpenDay);
+                    saveCompletions();
+                    renderGrid();
+                    updateCompleteButtonState();
+                    setTimeout(closeModal, 500); // Close modal after a short delay
+                }
+            });
+
+            // --- Initial Load ---
+            renderGrid();
+        });
+    </script>
+</body>
+</html>
