@@ -7,71 +7,43 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- Custom Animations and AI Theme --- */
-        @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(-45deg, #1d2b64, #3a506b, #2c3e50, #16222a);
-            background-size: 400% 400%;
-            animation: gradient-animation 15s ease infinite;
-            color: #f7fafc; /* Default text color to light gray */
+            /* --- Custom Background Image --- */
+            background-image: url('https://img.freepik.com/premium-photo/stock-chart-futuristic-technology-style-ai-generated_767640-21.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #e5e7eb; /* Default text to light gray */
         }
-
         .challenge-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: fade-in 0.5s ease-out forwards;
-            opacity: 0;
+            /* --- Glassmorphism Effect --- */
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
         .challenge-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
         }
-
         .locked-card {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.5);
             cursor: not-allowed;
         }
-
         .completed-card {
             border-left-color: #34d399; /* emerald-400 */
         }
-
         .day-header {
             background: linear-gradient(90deg, #4f46e5, #ec4899);
         }
-
-        /* Staggered animation for cards */
-        .challenge-card:nth-child(1) { animation-delay: 0.1s; }
-        .challenge-card:nth-child(2) { animation-delay: 0.15s; }
-        .challenge-card:nth-child(3) { animation-delay: 0.2s; }
-        .challenge-card:nth-child(4) { animation-delay: 0.25s; }
-        .challenge-card:nth-child(5) { animation-delay: 0.3s; }
-        .challenge-card:nth-child(6) { animation-delay: 0.35s; }
-        .challenge-card:nth-child(7) { animation-delay: 0.4s; }
-        .challenge-card:nth-child(8) { animation-delay: 0.45s; }
-        .challenge-card:nth-child(9) { animation-delay: 0.5s; }
-        .challenge-card:nth-child(10) { animation-delay: 0.55s; }
     </style>
 </head>
 <body class="text-gray-200">
 
     <div class="container mx-auto px-4 py-8 md:py-12">
 
-        <header class="text-center mb-12" style="animation: fade-in 0.5s ease-out forwards;">
+        <header class="text-center mb-10">
             <h1 class="text-4xl md:text-5xl font-bold text-white">30-Day AI Challenge</h1>
             <p class="mt-3 text-lg text-gray-300">Explore the world of AI with a new mini-challenge every day.</p>
         </header>
@@ -91,7 +63,7 @@
                     <p id="modal-description" class="text-gray-300 mb-4"></p>
                     <div id="modal-content" class="space-y-4 text-gray-200"></div>
                      <div class="mt-6 flex justify-end">
-                        <button id="complete-challenge-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg transition-transform transform hover:scale-105">Mark as Complete</button>
+                        <button id="complete-challenge-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg">Mark as Complete</button>
                     </div>
                 </div>
             </div>
@@ -165,7 +137,7 @@
                     const day = index + 1;
                     const isUnlocked = day <= dayOfChallenge;
                     const card = document.createElement('div');
-                    card.className = `challenge-card p-4 border-l-4 rounded-lg shadow-md cursor-pointer ${
+                    card.className = `challenge-card p-4 border-l-4 rounded-lg shadow-lg cursor-pointer ${
                         !isUnlocked ? 'locked-card' : ''
                     } ${isCompleted(day) ? 'completed-card border-emerald-400' : 'border-transparent'}`;
                     
