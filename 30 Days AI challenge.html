@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>30-Day AI Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .challenge-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .challenge-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .locked-card {
+            background-color: #f3f4f6; /* gray-100 */
+            cursor: not-allowed;
+        }
+        .completed-card {
+            border-left-color: #10b981; /* emerald-500 */
+        }
+        .day-header {
+            background: linear-gradient(90deg, #4f46e5, #ec4899);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">30-Day AI Challenge</h1>
+            <p class="mt-3 text-lg text-gray-600">Explore the world of AI with a new mini-challenge every day.</p>
+        </header>
+
+        <div id="challenge-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <!-- Challenge cards will be injected here by JavaScript -->
+        </div>
+
+        <!-- Modal for displaying challenge details -->
+        <div id="challenge-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-full overflow-y-auto">
+                <div id="modal-header" class="day-header text-white p-4 flex justify-between items-center rounded-t-lg">
+                    <h2 id="modal-title" class="text-2xl font-bold"></h2>
+                    <button id="close-modal" class="text-2xl font-bold">&times;</button>
+                </div>
+                <div class="p-6">
+                    <p id="modal-description" class="text-gray-700 mb-4"></p>
+                    <div id="modal-content" class="space-y-4"></div>
+                     <div class="mt-6 flex justify-end">
+                        <button id="complete-challenge-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 px-4 rounded-lg">Mark as Complete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const challenges = [
+                { title: "AI in Your Pocket", description: "Identify three AI-powered features on your smartphone. Think about camera enhancements, predictive text, or voice assistants.", content: "<strong>Task:</strong> List three AI features on your phone and write one sentence for each explaining what it does. For example: 'Portrait Mode on my camera uses AI to blur the background.'" },
+                { title: "The Turing Test", description: "Spend 5 minutes chatting with a public chatbot (like one on a retail website). Can you tell it's an AI? What are the giveaways?", content: "<strong>Task:</strong> Note down three things that made you feel you were talking to an AI. Was it the speed of the replies, the formality of the language, or something else?" },
+                { title: "AI Image Prompting", description: "Use a free AI image generator (like Bing Image Creator) to create a picture of a 'cyberpunk cat riding a unicorn'.", content: "<strong>Task:</strong> Experiment with changing one word in your prompt. How does the image change? Share your favorite generated image and the prompt you used." },
+                { title: "Ethical AI", description: "Read a short article about AI bias. What is one example of how AI can show bias?", content: "<strong>Task:</strong> Summarize the example of AI bias in two sentences. Think about why this bias might occur (e.g., biased training data)." },
+                { title: "AI for Productivity", description: "Use an AI tool (like ChatGPT or Gemini) to summarize a long news article for you.", content: "<strong>Task:</strong> Compare the AI summary to the original article. Did it capture the main points accurately? How long did it take you versus the AI?" },
+                { title: "AI in Entertainment", description: "Think about your favorite movie or video game. Where might AI be used in its creation or function?", content: "<strong>Task:</strong> List two potential uses of AI in the movie/game. Examples could be NPC behavior, special effects, or personalized recommendations." },
+                { title: "De-Mystifying Algorithms", description: "Your social media feed is powered by an AI algorithm. What do you think it's trying to optimize for?", content: "<strong>Task:</strong> Write down what you think the goal of your favorite social media feed's algorithm is. Is it engagement, time spent on the app, or something else?" },
+                { title: "AI & Music", description: "Listen to a playlist generated by an AI (like Spotify's Discover Weekly). Did you find a new song you liked?", content: "<strong>Task:</strong> Reflect on the AI's recommendations. How well does it seem to understand your music taste? What might it be missing?" },
+                { title: "The 'Smart' Home", description: "Imagine a 'smart' kitchen. What are three AI-powered features you would want it to have?", content: "<strong>Task:</strong> Brainstorm and list three futuristic but plausible AI features for a kitchen. For example, a fridge that auto-generates a shopping list." },
+                { title: "AI in Healthcare", description: "Watch a short (under 5 min) video about how AI is used to detect diseases.", content: "<strong>Task:</strong> In your own words, explain one way AI is helping doctors. What are the potential benefits?" },
+                { title: "Creative Writing with AI", description: "Give an AI the first line of a story: 'The old lighthouse keeper found a message in a bottle, but it was written in a language no one had ever seen.' Ask it to continue the story.", content: "<strong>Task:</strong> Read the AI's story. What did you like or dislike? How was it different from what you might have written?" },
+                { title: "AI and Language", description: "Use an online translator to translate a simple phrase into a language you don't know, and then translate it back to your language. Does it come back the same?", content: "<strong>Task:</strong> Note any differences in the re-translated phrase. Why do you think these inaccuracies happen?" },
+                { title: "Job Automation", description: "Think about your dream job. What is one task in that job that could be automated or assisted by AI in the future?", content: "<strong>Task:</strong> Describe the task and how AI could help. Would it make the job better or worse?" },
+                { title: "AI Art Styles", description: "Use an AI image generator to create the same subject (e.g., 'a peaceful lake') in three different art styles: 'impressionist', 'pixel art', and 'photorealistic'.", content: "<strong>Task:</strong> Compare the three images. Which style do you prefer and why? Notice how the AI interprets these artistic concepts." },
+                { title: "Explaining AI to a Child", description: "How would you explain 'Artificial Intelligence' to a 10-year-old in just a few sentences?", content: "<strong>Task:</strong> Write down your simple explanation. The goal is clarity and simplicity, not technical accuracy. Think of an analogy!" },
+                { title: "AI in Navigation", description: "Think about the last time you used a map app (like Google Maps or Waze). List two AI features it uses.", content: "<strong>Task:</strong> Consider how it calculates the fastest route, estimates traffic, and suggests alternative routes. Those are likely AI-driven." },
+                { title: "Personalized Ads", description: "Find an online ad that was clearly targeted to you. What clues tell you it's personalized?", content: "<strong>Task:</strong> Based on the ad, what does the AI think it knows about you? (e.g., your interests, recent searches, age group)." },
+                { title: "AI Fact-Checking", description: "Ask an AI assistant a complex factual question. Then, try to verify its answer using a traditional search engine.", content: "<strong>Task:</strong> Did the AI get it right? Was its answer nuanced or overly simplistic? This is a good exercise in not always trusting AI output blindly." },
+                { title: "The 'Uncanny Valley'", description: "Look up images of 'uncanny valley' robots or CGI characters. What makes them feel unsettling?", content: "<strong>Task:</strong> Describe the feeling of the uncanny valley. It's that strange sense when something looks almost human, but not quite." },
+                { title: "AI for Accessibility", description: "Research one way AI is helping people with disabilities. Examples include screen readers or live captioning.", content: "<strong>Task:</strong> Write a short paragraph about the AI tool and who it helps. This highlights the positive impact of AI." },
+                { title: "Deepfakes", description: "Watch an example of a 'deepfake' video. What are the potential dangers of this technology?", content: "<strong>Task:</strong> List two potential negative consequences of deepfake technology. Think about misinformation or impersonation." },
+                { title: "AI in Gaming", description: "Play a simple online game against an AI opponent (like chess or tic-tac-toe). Can you beat it?", content: "<strong>Task:</strong> Reflect on the AI's strategy. Did it seem to learn from your moves? Was it challenging?" },
+                { title: "Recommender Systems", description: "Go to a streaming service or e-commerce site. Analyze the 'Recommended for you' section. Why do you think it's showing you those specific items?", content: "<strong>Task:</strong> Try to reverse-engineer the recommendation. Is it based on one thing you watched/bought, or a combination of factors?" },
+                { title: "AI-Generated Code", description: "If you have any coding experience, ask an AI to write a simple function (e.g., 'a Python function to check if a word is a palindrome'). If not, ask it to explain a simple code snippet.", content: "<strong>Task:</strong> Review the code or explanation. Is it clean and correct? This shows AI's potential as a tool for developers." },
+                { title: "Data Privacy", description: "Consider all the AI systems you've interacted with this month. What personal data have you given them?", content: "<strong>Task:</strong> Make a list of the types of data you've shared (e.g., voice commands, location history, shopping habits). This raises awareness about your digital footprint." },
+                { title: "AI in Weather Forecasting", description: "Read about how AI is improving weather forecasts. How does it differ from traditional methods?", content: "<strong>Task:</strong> Summarize one key advantage of using AI for weather prediction. Is it speed, accuracy, or long-range forecasting?" },
+                { title: "The Future of AI", description: "Brainstorm a completely new, helpful application for AI that doesn't exist yet.", content: "<strong>Task:</strong> Write a short paragraph describing your invention. What problem does it solve? Who would use it?" },
+                { title: "AI-Powered Search", description: "Compare the results for a complex query on a standard search engine versus an AI-powered search (like Perplexity AI or Google's AI Overviews).", content: "<strong>Task:</strong> Note the differences in presentation. Does the AI give a direct answer? Does the search engine give you links? Which do you prefer?" },
+                { title: "Generative AI", description: "Think about the difference between 'AI' and 'Generative AI'. How would you describe it?", content: "<strong>Task:</strong> Write your own definition for 'Generative AI'. The key is that it *creates* something new (text, images, music) rather than just analyzing data." },
+                { title: "Your AI Journey", description: "Reflect on the past 30 days. What is the most surprising or interesting thing you've learned about AI?", content: "<strong>Task:</strong> Write a few sentences summarizing your main takeaway from this challenge. Has your perception of AI changed?" },
+            ];
+
+            const grid = document.getElementById('challenge-grid');
+            const modal = document.getElementById('challenge-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const modalContent = document.getElementById('modal-content');
+            const closeModalBtn = document.getElementById('close-modal');
+            const completeChallengeBtn = document.getElementById('complete-challenge-btn');
+
+            // --- State Management ---
+            const startDate = new Date('2025-07-05'); // Challenge start date
+            const today = new Date();
+            const dayOfChallenge = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+            
+            let completions = JSON.parse(localStorage.getItem('aiChallengeCompletions')) || [];
+            let currentOpenDay = -1;
+
+            function saveCompletions() {
+                localStorage.setItem('aiChallengeCompletions', JSON.stringify(completions));
+            }
+
+            function isCompleted(day) {
+                return completions.includes(day);
+            }
+
+            // --- UI Rendering ---
+            function renderGrid() {
+                grid.innerHTML = '';
+                challenges.forEach((challenge, index) => {
+                    const day = index + 1;
+                    const isUnlocked = day <= dayOfChallenge;
+                    const card = document.createElement('div');
+                    card.className = `challenge-card p-4 border-l-4 rounded-lg shadow-md cursor-pointer ${
+                        isUnlocked ? 'bg-white' : 'locked-card'
+                    } ${isCompleted(day) ? 'completed-card border-emerald-500' : 'border-gray-200'}`;
+                    
+                    if (isUnlocked) {
+                        card.addEventListener('click', () => openModal(day));
+                    }
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-lg ${isUnlocked ? 'text-indigo-600' : 'text-gray-500'}">Day ${day}</span>
+                            ${isCompleted(day) ? '<span class="text-emerald-500 font-bold text-xs">✔ DONE</span>' : ''}
+                            ${!isUnlocked ? '<span class="text-gray-400 text-2xl">🔒</span>' : ''}
+                        </div>
+                        <h3 class="font-semibold ${isUnlocked ? 'text-gray-800' : 'text-gray-500'}">${challenge.title}</h3>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            // --- Modal Logic ---
+            function openModal(day) {
+                currentOpenDay = day;
+                const challenge = challenges[day - 1];
+                modalTitle.textContent = `Day ${day}: ${challenge.title}`;
+                modalDescription.textContent = challenge.description;
+                modalContent.innerHTML = challenge.content;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+
+                updateCompleteButtonState();
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                currentOpenDay = -1;
+            }
+            
+            function updateCompleteButtonState() {
+                if (isCompleted(currentOpenDay)) {
+                    completeChallengeBtn.textContent = 'Completed!';
+                    completeChallengeBtn.disabled = true;
+                    completeChallengeBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
+                    completeChallengeBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                } else {
+                    completeChallengeBtn.textContent = 'Mark as Complete';
+                    completeChallengeBtn.disabled = false;
+                    completeChallengeBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
+                    completeChallengeBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                }
+            }
+
+            // --- Event Listeners ---
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            completeChallengeBtn.addEventListener('click', () => {
+                if (currentOpenDay > 0 && !isCompleted(currentOpenDay)) {
+                    completions.push(currentOpenDay);
+                    saveCompletions();
+                    renderGrid();
+                    updateCompleteButtonState();
+                    setTimeout(closeModal, 500); // Close modal after a short delay
+                }
+            });
+
+            // --- Initial Load ---
+            renderGrid();
+        });
+    </script>
+</body>
+</html>
