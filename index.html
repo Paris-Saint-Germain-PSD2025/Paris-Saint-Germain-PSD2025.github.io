@@ -22,6 +22,10 @@
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 120px; /* Ensure consistent card height */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .challenge-card:hover {
             transform: translateY(-5px);
@@ -30,6 +34,10 @@
         .locked-card {
             background: rgba(0, 0, 0, 0.5);
             cursor: not-allowed;
+        }
+        .completed-card-image {
+            background-size: cover;
+            background-position: center;
         }
         .completed-card {
             border-left-color: #34d399; /* emerald-400 */
@@ -74,7 +82,12 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const challenges = [
-                { title: "AI in Your Pocket", description: "Identify three AI-powered features on your smartphone. Think about camera enhancements, predictive text, or voice assistants.", content: "<strong>Task:</strong> List three AI features on your phone and write one sentence for each explaining what it does. For example: 'Portrait Mode on my camera uses AI to blur the background.'" },
+                { 
+                    title: "AI in Your Pocket", 
+                    description: "Identify three AI-powered features on your smartphone. Think about camera enhancements, predictive text, or voice assistants.", 
+                    content: "<strong>Task:</strong> List three AI features on your phone and write one sentence for each explaining what it does. For example: 'Portrait Mode on my camera uses AI to blur the background.'",
+                    completionImage: 'https://media.lesechos.com/api/v1/images/view/653a4cfe51a0607f6f18420f/1280x720/352689-intelligence-artificielle-vers-l-entreprise-augmentee-web-tete-0901733887588.jpg'
+                },
                 { title: "The Turing Test", description: "Spend 5 minutes chatting with a public chatbot (like one on a retail website). Can you tell it's an AI? What are the giveaways?", content: "<strong>Task:</strong> Note down three things that made you feel you were talking to an AI. Was it the speed of the replies, the formality of the language, or something else?" },
                 { title: "AI Image Prompting", description: "Use a free AI image generator (like Bing Image Creator) to create a picture of a 'cyberpunk cat riding a unicorn'.", content: "<strong>Task:</strong> Experiment with changing one word in your prompt. How does the image change? Share your favorite generated image and the prompt you used." },
                 { title: "Ethical AI", description: "Read a short article about AI bias. What is one example of how AI can show bias?", content: "<strong>Task:</strong> Summarize the example of AI bias in two sentences. Think about why this bias might occur (e.g., biased training data)." },
@@ -136,23 +149,32 @@
                 challenges.forEach((challenge, index) => {
                     const day = index + 1;
                     const isUnlocked = day <= dayOfChallenge;
+                    const completed = isCompleted(day);
                     const card = document.createElement('div');
-                    card.className = `challenge-card p-4 border-l-4 rounded-lg shadow-lg cursor-pointer ${
-                        !isUnlocked ? 'locked-card' : ''
-                    } ${isCompleted(day) ? 'completed-card border-emerald-400' : 'border-transparent'}`;
-                    
-                    if (isUnlocked) {
-                        card.addEventListener('click', () => openModal(day));
-                    }
 
-                    card.innerHTML = `
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="font-bold text-lg ${isUnlocked ? 'text-white' : 'text-gray-400'}">Day ${day}</span>
-                            ${isCompleted(day) ? '<span class="text-emerald-400 font-bold text-xs">✔ DONE</span>' : ''}
-                            ${!isUnlocked ? '<span class="text-gray-500 text-2xl">🔒</span>' : ''}
-                        </div>
-                        <h3 class="font-semibold ${isUnlocked ? 'text-gray-200' : 'text-gray-500'}">${challenge.title}</h3>
-                    `;
+                    // Check if the day is completed and has a special completion image
+                    if (completed && challenge.completionImage) {
+                        card.className = 'challenge-card rounded-lg shadow-lg completed-card-image';
+                        card.style.backgroundImage = `url('${challenge.completionImage}')`;
+                    } else {
+                        // Standard card rendering
+                        card.className = `challenge-card p-4 border-l-4 rounded-lg shadow-lg cursor-pointer ${
+                            !isUnlocked ? 'locked-card' : ''
+                        } ${completed ? 'completed-card border-emerald-400' : 'border-transparent'}`;
+                        
+                        if (isUnlocked) {
+                            card.addEventListener('click', () => openModal(day));
+                        }
+
+                        card.innerHTML = `
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-lg ${isUnlocked ? 'text-white' : 'text-gray-400'}">Day ${day}</span>
+                                ${completed ? '<span class="text-emerald-400 font-bold text-xs">✔ DONE</span>' : ''}
+                                ${!isUnlocked ? '<span class="text-gray-500 text-2xl">🔒</span>' : ''}
+                            </div>
+                            <h3 class="font-semibold ${isUnlocked ? 'text-gray-200' : 'text-gray-500'}">${challenge.title}</h3>
+                        `;
+                    }
                     grid.appendChild(card);
                 });
             }
