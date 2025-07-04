@@ -105,7 +105,8 @@
             const completeChallengeBtn = document.getElementById('complete-challenge-btn');
 
             // --- State Management ---
-            const startDate = new Date('2025-07-05'); // Challenge start date
+            // **FIXED**: Using a specific time string ensures the date starts at midnight in the user's local timezone.
+            const startDate = new Date('2025-07-05T00:00:00'); 
             const today = new Date();
             const dayOfChallenge = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
             
